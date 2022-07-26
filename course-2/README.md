@@ -2,7 +2,7 @@
 在数据库建一个表 user(id, name, email,age),插入N条记录。
 1. 用 go 实现从表里读出数据，并输出到一个文件每行一条记录，用逗号分隔。
 2. 要求：
-   1. 插入N条数据到表里用一个 goroutine 实现
+   1. 插入 N 条数据到表里用一个 goroutine 实现
    2. 读表逻辑用一个 goroutine 来实现
    3. 输出到一个文件的逻辑用 goroutine 来实现；
    4. 插入逻辑完成后通知读表逻辑读取数据
@@ -11,6 +11,35 @@
 
 
 # 个人学习
+go 写 file
+```go
+package main
+import (
+    "bufio"
+    "fmt"
+    "os"
+)
+
+func main() {
+    //创建一个新文件，写入内容 5 句 “http://c.biancheng.net/golang/”
+    filePath := "e:/code/golang.txt"
+    file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
+    if err != nil {
+        fmt.Println("文件打开失败", err)
+    }
+    //及时关闭file句柄
+    defer file.Close()
+    //写入文件时，使用带缓存的 *Writer
+    write := bufio.NewWriter(file)
+    for i := 0; i < 5; i++ {
+        write.WriteString("http://c.biancheng.net/golang/ \n")
+    }
+    //Flush将缓存的文件真正写入到文件中
+    write.Flush()
+}
+```
+
+
 go 连接 MySQL 读写
 ```go
 package main
@@ -189,4 +218,28 @@ Create Table: CREATE TABLE `user` (
 数据库连接方式
 ```shell
 mysql -ugotest -P 4201 -h127.0.0.1 -p'gotest'
+```
+
+```shell
+$ go run main.go 
+数据插入成功，进行数据查询和数据写入文件
+数据为: {1 一号 1@qq.com 18}
+数据为: {2 二号 2@qq.com 18}
+数据为: {3 三号 3@qq.com 18}
+写入成功
+
+$ cat user.txt 
+1 一号 1@qq.com 18
+2 二号 2@qq.com 18
+3 三号 3@qq.com 18
+
+$ mysql -ugotest -P 4201 -h127.0.0.1 -p'gotest' test -e "select * from user;"
+mysql: [Warning] Using a password on the command line interface can be insecure.
++----+--------+----------+------+
+| id | name   | email    | age  |
++----+--------+----------+------+
+|  1 | 一号   | 1@qq.com |   18 |
+|  2 | 二号   | 2@qq.com |   18 |
+|  3 | 三号   | 3@qq.com |   18 |
++----+--------+----------+------+
 ```

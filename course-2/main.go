@@ -88,7 +88,7 @@ func QueryMulti(DB *sql.DB, c chan string) {
 }
 
 // 写文件
-func WriteFle(content chan string, c chan bool) {
+func WriteFile(content chan string, c chan bool) {
 	//创建一个新文件
 	filePath := "user.txt"
 	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
@@ -139,7 +139,7 @@ func main() {
 	if rlt {
 		fmt.Println("数据插入成功，进行数据查询和数据写入文件")
 		go QueryMulti(db, c1)
-		go WriteFle(c1, c)
+		go WriteFile(c1, c)
 
 		<-c
 		close(c)
